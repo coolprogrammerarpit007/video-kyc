@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\KycSessionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,6 @@ Route::get('/user', function (Request $request) {
 Route::prefix('v1')->group(function(){
     Route::post('/auth/register',[AuthController::class,'register']);
     Route::post('/auth/login',[AuthController::class,'login']);
-    Route::middleware(['auth:sanctum','role:user'])->post('/auth/logout',[AuthController::class,'logout']);
 
 
     // ***************** Testing Middleware Roues *******************
@@ -26,3 +26,21 @@ Route::prefix('v1')->group(function(){
 
     // ***************************************************************
 });
+
+
+/*
+   ************************   KYC Session APIS **************************
+   ***********************       User Client Side Api              **************************
+
+*/
+
+
+Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
+    Route::post('/auth/logout',[AuthController::class,'logout']);
+    Route::post('/kyc/sessions',[KycSessionController::class,'store']);
+    Route::get('/kyc/sessions/{uuid}',[KycSessionController::class,'show']);
+});
+
+
+
+// *******************************************************************************************
