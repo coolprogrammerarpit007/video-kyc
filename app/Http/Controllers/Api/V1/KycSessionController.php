@@ -38,6 +38,7 @@ class KycSessionController extends Controller
                     'id' => $session->id,
                     'user_id' => $session->user_id,
                     'status' => $session->status,
+                    'uuid' => $session->uuid,
                     'requested_at' => $session->requested_at,
                     'expired_at' => $session->expired_at,
                 ],

@@ -48,6 +48,11 @@ class KycUser extends Authenticatable
         return $this->belongsTo(User::class,'user_id','id');
     }
 
+    public function kycSessions()
+    {
+        return $this->hasMany(KycSession::class,'user_id','id');
+    }
+
 
     /* ============================
      |  Role Helper Methods

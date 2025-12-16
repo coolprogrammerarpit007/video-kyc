@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\KycSession;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Carbon\Carbon;
+
+class VerifierKycSessionController extends Controller
+{
+    public function index()
+    {
+        try
+        {
+            $sessions = KycSession::getAllPendingSessions();
+
+            return response()->json([
+                'status' => true,
+                'msg' => 'All sessions fetched successfully',
+                'sessions' => $sessions
+            ])->setStatusCode(200);
+        }
+
+        catch(\Exception $e)
+        {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Failed to fetch pending kyc sessions',
+                'errors' => $e->getMessage()
+            ],500);
+        }
+    }
+
+
+    public function accept(Request $request)
+    {
+        try
+        {
+
+            $verifier = $request->user();
+
+            DB::beginTransaction();
+
+            $session = KycSession::where('id',$request->id)->lockForUpdate()->first();
+
+            if(!$session)
+            {
+                DB::rollBack();
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'KYC session not found!'
+                ],404);
+            }
+
+            // check if session is not attended by any verifier yet and state is pending
+            if(!$session->isAvailable())
+            {
+                DB::rollBack();
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Unavailable Kyc Session'
+                ])->setStatusCode(409);
+            }
+
+            if($session->isExpired())
+            {
+                $session->update(['status' => 'expired']);
+                DB::commit();
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'KYC session has been expired'
+                ])->setStatusCode(410);
+            }
+
+            //  Assign Verifier
+            $session->update([
+                'verifier_id' => $verifier->id,
+                'status' => 'in_progress',
+                'assigned_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Kyc Session accepted successfully!',
+                'data' => $session
+            ],200);
+
+        }
+
+        catch(\Exception $e)
+        {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'msg' => 'Failed to accept Kyc session',
+                'errors' => $e->getMessage()
+            ],500);
+        }
+    }
+}
