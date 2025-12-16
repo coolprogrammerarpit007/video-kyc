@@ -1,0 +1,21 @@
+Verifier Work Flow
+
+Login
+ ↓
+(offline)
+ ↓
+POST /status/online
+ ↓
+available
+ ↓
+(auto-assigned)
+ ↓
+busy
+ ↓
+(session ends)
+ ↓
+available
+ ↓
+POST /status/offline
+ ↓
+offline

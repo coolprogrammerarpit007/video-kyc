@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\KycSessionController;
 use App\Http\Controllers\Api\V1\VerifierKycSessionController;
+use App\Http\Controllers\Api\V1\VerifierStatusController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -66,4 +67,9 @@ Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
 Route::middleware(['auth:sanctum','role:verifier'])->prefix('v1')->group(function(){
     Route::get('/kyc-session-applications',[VerifierKycSessionController::class,'index']);
     Route::post('/kyc-sessions/accept',[VerifierKycSessionController::class,'accept']);
+
+
+    //  ************ Verifier Inter APIs **************
+
+    Route::post('/verifier/status',[VerifierStatusController::class,'checkAvailablity']);
 });

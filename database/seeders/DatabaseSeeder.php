@@ -25,5 +25,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             VerifierSeeder::class
         ]);
+
+        $this->call([
+            VerifierStatusSeeder::class
+        ]);
     }
 }
