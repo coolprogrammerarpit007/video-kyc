@@ -19,3 +19,75 @@ available
 POST /status/offline
  ↓
 offline
+
+
+
+// ************ Real Time User Verifier Video KYC Architecture *******************
+
+Case: User opens early, verifier late
+
+User opens URL
+→ GET session (pending)
+→ subscribes to channel
+→ waiting UI
+
+Verifier joins session
+→ VerifierJoined event
+→ UI updates
+
+User clicks "Start KYC"
+→ UserJoined event
+→ verifier notified
+→ video can start
+
+
+
+Case: Verifier opens first, user late
+
+Verifier joins
+→ waiting UI
+
+User opens URL later
+→ GET session (in_progress)
+→ subscribes to channel
+→ sees "Verifier waiting"
+
+User clicks "Start KYC"
+→ UserJoined event
+→ both ready
+
+
+🧠 Presence ≠ forever
+
+Presence is temporary.
+
+If:
+
+tab closes
+
+internet drops
+
+browser crashes
+
+Presence must be lost.
+
+Later we’ll handle:
+
+disconnects
+
+reconnects
+
+grace periods
+
+
+
+//***************************
+
+🧠 6. Event naming suggestion (for clarity)
+
+To avoid confusion later, I strongly recommend:
+
+Purpose	Event name
+Assignment	VerifierAssigned
+Verifier presence	VerifierJoinedSession
+User presence	UserJoinedSession

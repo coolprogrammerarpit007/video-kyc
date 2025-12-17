@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\VerifierJoined;
 use App\Models\KycUser;
 use App\Models\KycSession;
 use App\Models\VerifierStatus;
@@ -58,6 +59,13 @@ class KycAutoAssignmentService
                 'status' => 'busy',
                 'active_session_id' => $session->id
             ]);
+
+            // Broadcast Assignment event
+
+            event(new VerifierJoined(
+                $session->uuid,
+                $session->verifier_id
+            ));
 
             return true;
         });

@@ -7,6 +7,7 @@ use App\Models\KycSession;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Events\VerifierJoined;
 
 class VerifierKycSessionController extends Controller
 {
@@ -83,6 +84,11 @@ class VerifierKycSessionController extends Controller
             ]);
 
             DB::commit();
+
+            event(new VerifierJoined(
+                $session->uuid,
+                $verifier->id
+            ));
 
             return response()->json([
                 'status' => true,
