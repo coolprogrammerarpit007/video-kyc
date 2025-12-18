@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\KycSessionController;
 use App\Http\Controllers\Api\V1\VerifierKycSessionController;
 use App\Http\Controllers\Api\V1\VerifierStatusController;
+use App\Http\Controllers\Api\V1\WebRtcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,3 +76,18 @@ Route::middleware(['auth:sanctum','role:verifier'])->prefix('v1')->group(functio
 
     Route::post('/verifier/status',[VerifierStatusController::class,'checkAvailablity']);
 });
+
+
+
+// ********************** Webhook and WebRTC API Routes ****************
+
+Route::middleware('auth:sanctum')->prefix('v1/kyc/webrtc')->group(function(){
+
+    Route::post('/offer',[WebRtcController::class,'sendOffer']);
+    Route::post('/answer',[WebRtcController::class,'sendAnswer']);
+    Route::post('/ice',[WebRtcController::class,'sendIce']);
+
+});
+
+
+// *********************************************************************
