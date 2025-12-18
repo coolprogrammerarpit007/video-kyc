@@ -30,7 +30,7 @@ class WebRtcAnswerSent
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('kyc-channel' . $this->sessionUuid),
+            new PrivateChannel('kyc-session' . $this->sessionUuid),
         ];
     }
 

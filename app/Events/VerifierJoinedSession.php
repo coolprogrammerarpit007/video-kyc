@@ -34,7 +34,7 @@ class VerifierJoinedSession
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('kyc-channel' . $this->sessionId),
+            new PrivateChannel('kyc-session' . $this->sessionId),
         ];
     }
 
