@@ -58,6 +58,13 @@ class KycSession extends Model
         return $is_available;
     }
 
+    public function canStartVideo()
+    {
+        $permission = $this->status == 'in_progress' && $this->expired_at && Carbon::parse($this->expired_at)->isFuture() && $this->verifier_id != null && $this->verifier_joined_at != null and $this->user_joined_at != null;
+
+        return $permission;
+    }
+
 
     public static function getAllPendingSessions()
     {

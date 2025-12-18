@@ -46,6 +46,7 @@ Route::prefix('v1')->group(function(){
 Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
     Route::post('/kyc/sessions',[KycSessionController::class,'store']);
     Route::get('/kyc/sessions/{uuid}',[KycSessionController::class,'show']);
+    Route::post('/kyc/sessions/user/join',[KycSessionController::class,'join']);
 });
 
 
@@ -67,6 +68,7 @@ Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
 Route::middleware(['auth:sanctum','role:verifier'])->prefix('v1')->group(function(){
     Route::get('/kyc-session-applications',[VerifierKycSessionController::class,'index']);
     Route::post('/kyc-sessions/accept',[VerifierKycSessionController::class,'accept']);
+    Route::post('/kyc-sessions/verifier/join',[VerifierKycSessionController::class,'verifierJoin']);
 
 
     //  ************ Verifier Inter APIs **************

@@ -1,0 +1,230 @@
+🎯 What this phase is about (1-line truth)
+
+WebRTC is the technology that allows two browsers to send live audio/video directly to each other.
+
+Laravel does NOT send video.
+Laravel only helps the browsers find each other.
+
+🧠 First remove a BIG misconception (VERY IMPORTANT)
+
+❌ WebSocket sends video
+❌ Laravel handles media
+❌ Server relays camera stream
+
+🧠 Correct mental model (LOCK THIS)
+
+Camera/Mic
+   ↓
+Browser (User)  ←──────→  Browser (Verifier)
+   ↑                    ↑
+   └──── Laravel WebSocket (SIGNALING ONLY)
+
+
+Video/audio goes browser ↔ browser
+
+Laravel only exchanges messages (signals)
+
+🧠 What problem WebRTC solves
+
+Browsers are:
+
+behind NAT
+
+behind firewalls
+
+don’t know each other’s IPs
+
+WebRTC solves:
+
+discovery
+
+negotiation
+
+connection
+
+encryption
+
+
+🧩 WebRTC has 3 CORE PARTS (MEMORIZE)
+1️⃣ Media
+
+Camera & microphone access
+(getUserMedia)
+
+2️⃣ Connection
+
+Peer-to-Peer tunnel
+(RTCPeerConnection)
+
+3️⃣ Signaling
+
+Exchange connection info
+(THIS IS WHERE LARAVEL COMES IN)
+
+
+🧠 What is “Signaling”?
+
+Signaling = exchanging metadata required to establish a WebRTC connection
+
+Examples:
+
+“I want to start a call”
+
+“Here is my connection offer”
+
+“Here is my answer”
+
+“Here is my network candidate”
+
+This data is:
+
+small JSON
+
+NOT audio/video
+
+safe to send via WebSocket
+
+
+🧠 WebRTC handshake (VERY IMPORTANT FLOW)
+
+This is the core flow you must understand.
+
+step-1: User creates OFFER
+
+User browser:
+“I want to start video”
+↓
+Creates SDP OFFER
+
+Step-2: Offer sent via Laravel
+
+POST /send-offer
+↓
+Laravel broadcasts offer
+
+Step-3: Verifier receives OFFER
+
+Verifier browser:
+“Got offer”
+↓
+Creates SDP ANSWER
+
+Step-4: Answer sent back
+
+POST /send-answer
+↓
+Laravel broadcasts answer
+
+
+Step-5: ICE candidates exchange
+
+Both sides:
+“Here’s my network info”
+↓
+Laravel broadcasts candidates
+
+
+After this:
+✅ Peer-to-peer connection established
+✅ Video starts flowing directly
+
+🧠 What are SDP & ICE (simple explanation)
+🔹 SDP (Session Description Protocol)
+
+Think of it as:
+
+“Here’s how I can talk (video/audio formats, codecs, etc.)”
+
+Two types:
+
+OFFER
+
+ANSWER
+
+🔹 ICE Candidates
+
+Think of it as:
+
+“Here are the possible network paths you can reach me on”
+
+Exchanged many times.
+
+🧠 Why Laravel WebSocket is PERFECT here
+
+Laravel WebSocket:
+
+real-time
+
+authenticated
+
+session-scoped
+
+reliable
+
+Laravel:
+
+does not care what SDP is
+
+just forwards messages securely
+
+🧠 Mapping WebRTC to YOUR KYC system
+Concept	Your system
+Signaling channel	kyc-session.{uuid}
+Offer sender	User
+Answer sender	Verifier
+Permission gate	can_start_video
+Security	Channel authorization
+
+Perfect match.
+
+🧠 IMPORTANT RULE (LOCK THIS)
+
+❌ Never start WebRTC before can_start_video === true
+
+Frontend MUST check this before:
+
+creating offer
+
+accessing camera
+
+
+
+
+//*******************************************
+
+
+High Level Signalling flow
+
+User clicks "Start Video"
+↓
+User creates OFFER (SDP)
+↓
+Offer sent to Laravel
+↓
+Laravel broadcasts offer
+↓
+Verifier receives offer
+↓
+Verifier creates ANSWER (SDP)
+↓
+Answer sent to Laravel
+↓
+Laravel broadcasts answer
+↓
+Both exchange ICE candidates
+↓
+Direct P2P video connection established
+
+
+
+// ********************************************
+// ********************************************
+
+
+| Action      | Who      | Meaning                     |
+| ----------- | -------- | --------------------------- |
+| Send OFFER  | User     | “I want to start video”     |
+| Send ANSWER | Verifier | “I accept video connection” |
+| Send ICE    | Both     | “Here’s how to reach me”    |
+
+

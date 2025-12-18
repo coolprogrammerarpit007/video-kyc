@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\UserJoinedSession;
 use App\Http\Controllers\Controller;
 use App\Models\KycSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 
 
@@ -80,7 +82,9 @@ class KycSessionController extends Controller
             }
 
             // Permission for user
-            $canStartVideo = $session->status == 'in_progress';
+            // $canStartVideo = $session->status == 'in_progress';
+            // $canUploadDocs = $session->status == 'in_progress';
+            $canStartVideo = $session->canStartVideo();
             $canUploadDocs = $session->status == 'in_progress';
 
             // UI STATE HINT
@@ -128,6 +132,89 @@ class KycSessionController extends Controller
                 'msg' => 'Error occurs on KYC Session',
                 'errors' => $e->getMessage()
             ],500);
+        }
+    }
+
+
+    public function join(Request $request)
+    {
+        try
+        {
+            $user = $request->user();
+            $validator = Validator::make($request->all(),[
+                'uuid' => 'required|string'
+            ]);
+
+            if($validator->fails())
+            {
+                return response()->json([
+                    'status' => false,
+                    'msg' => 'Validation fails',
+                    'errors' => $validator->errors()
+                ],422);
+            }
+
+            $validated_data = $validator->validate();
+            $session = KycSession::where('uuid',$validated_data['uuid'])->first();
+
+            // ownership check
+
+            if($session->user_id != $user->id)
+            {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthorized Access'
+                ],403);
+            }
+
+            // session must be active
+
+            if($session->status != 'in_progress')
+            {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Session is not ready to join'
+                ],409);
+            }
+
+
+            // prevent user join duplication
+
+            if($session->user_joined_at)
+            {
+                return response()->json([
+                    'status' => true,
+                    'message' => 'User already joined'
+                ],200);
+            }
+
+
+            // Mark user as joined
+            DB::transaction(function() use ($session){
+                $session::update([
+                    'user_joined_at' => Carbon::now(),
+                ]);
+            });
+
+            // Broadcast User Presence Event
+            event(new UserJoinedSession(
+                $session->uuid,
+                $user->id
+            ));
+
+            return response()->json([
+            'status' => true,
+            'message' => 'User joined session successfully',
+        ]);
+        }
+
+        catch(\Exception $e)
+        {
+            return response()->json([
+                'status' =>false,
+                'message' => 'Some error occurs! Please try again later',
+                'errors' => $e->getMessage()
+            ]);
         }
     }
 }
