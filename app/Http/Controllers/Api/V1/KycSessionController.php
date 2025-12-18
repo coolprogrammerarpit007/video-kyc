@@ -191,7 +191,7 @@ class KycSessionController extends Controller
 
             // Mark user as joined
             DB::transaction(function() use ($session){
-                $session::update([
+                $session->update([
                     'user_joined_at' => Carbon::now(),
                 ]);
             });

@@ -149,7 +149,11 @@ class WebRtcController extends Controller
 
         catch(\Exception $e)
         {
-
+            return response()->json([
+                'status' => false,
+                'message' => 'something occurs! while opening video.try again later',
+                'errors' => $e->getMessage()
+            ],500);
         }
     }
 

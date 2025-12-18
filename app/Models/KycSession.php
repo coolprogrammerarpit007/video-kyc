@@ -22,6 +22,8 @@ class KycSession extends Model
         'assigned_at',
         'completed_at',
         'expired_at',
+        'verifier_joined_at',
+        'user_joined_at'
     ];
 
 
@@ -30,6 +32,8 @@ class KycSession extends Model
         'assigned_at'  => 'datetime',
         'completed_at' => 'datetime',
         'expired_at'   => 'datetime',
+        'user_joined_at'   => 'datetime',
+        'verifier_joined_at'   => 'datetime',
     ];
 
     // relationships

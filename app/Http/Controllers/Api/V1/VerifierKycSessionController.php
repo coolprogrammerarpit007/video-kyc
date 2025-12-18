@@ -47,7 +47,7 @@ class VerifierKycSessionController extends Controller
 
             DB::beginTransaction();
 
-            $session = KycSession::where('id',$request->uuid)->lockForUpdate()->first();
+            $session = KycSession::where('uuid',$request->uuid)->lockForUpdate()->first();
 
             if(!$session)
             {
@@ -134,6 +134,8 @@ class VerifierKycSessionController extends Controller
             $validated_data = $validator->validate();
             $session = KycSession::where('uuid',$validated_data['uuid'])->first();
 
+
+
             // Must be assigned verifier
 
             if($session->verifier_id != $verifier->id)
@@ -164,7 +166,7 @@ class VerifierKycSessionController extends Controller
             }
 
             DB::transaction(function () use ($session) {
-                $session::update([
+                $session->update([
                     'verifier_joined_at' => Carbon::now()
                 ]);
             });

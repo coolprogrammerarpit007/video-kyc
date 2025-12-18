@@ -16,12 +16,12 @@ Route::get('/user', function (Request $request) {
 
 //  *************** Logout API ***********************
 
-Route::post('/auth/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 
 // ***************************************************
 Route::prefix('v1')->group(function(){
     Route::post('/auth/register',[AuthController::class,'register']);
     Route::post('/auth/login',[AuthController::class,'login']);
+    Route::post('/auth/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
 
 
     // ***************** Testing Middleware Roues *******************
@@ -47,7 +47,7 @@ Route::prefix('v1')->group(function(){
 Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
     Route::post('/kyc/sessions',[KycSessionController::class,'store']);
     Route::get('/kyc/sessions/{uuid}',[KycSessionController::class,'show']);
-    Route::post('/kyc/sessions/user/join',[KycSessionController::class,'join']);
+    Route::post('/kyc-sessions/user/join',[KycSessionController::class,'join']);
 });
 
 
