@@ -19,6 +19,7 @@ Route::get('/user', function (Request $request) {
 
 // ***************************************************
 Route::prefix('v1')->group(function(){
+    Route::get('/check-health',[AuthController::class,'check_health']);
     Route::post('/auth/register',[AuthController::class,'register']);
     Route::post('/auth/login',[AuthController::class,'login']);
     Route::post('/auth/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');

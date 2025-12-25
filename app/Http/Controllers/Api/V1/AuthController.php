@@ -17,6 +17,25 @@ class AuthController extends Controller
 {
 
 
+    public function check_health()
+    {
+        try
+        {
+            return response()->json([
+                'status' => true,
+                'msg' => 'api working correctly!'
+            ],200);
+        }
+
+        catch(\Exception $e)
+        {
+            return response()->json([
+                'status' => false,
+                'errors' => $e->getMessage()
+            ],500);
+        }
+    }
+
     public function register(Request $request)
     {
         try
