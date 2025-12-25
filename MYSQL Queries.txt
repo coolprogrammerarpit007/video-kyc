@@ -1,0 +1,328 @@
+SELECT first_name,last_name FROM employees;
+
+SELECT DISTINCT first_name,last_name FROM employees;
+
+SELECT first_name,last_name,email from employees WHERE employee_id = 101;
+
+SELECT first_name,last_name,email from employees WHERE employee_id IN (SELECT employee_id FROM salaries WHERE bonus > 10000 ORDER BY bonus ASC);
+
+SELECT first_name,last_name FROM employees WHERE first_name = "Alice" AND last_name = "Johnson";
+
+
+SELECT first_name,last_name FROM employees WHERE NOT first_name='Alice';
+
+SELECT department_name FROM departments WHERE department_name NOT LIKE 'H%';
+
+SELECT * FROM Customers
+WHERE CustomerID NOT BETWEEN 10 AND 60;
+
+SELECT * FROM Customers
+WHERE City NOT IN ('Paris', 'London');
+
+SELECT * FROM Customers
+WHERE NOT CustomerID > 50;
+
+INSERT INTO employees (employee_id,first_name,last_name,email)
+VALUES (112,"Vikas","Sharma","vikas.sharma@company.com"),
+(113,"Divyansh","Punjabi","divyansh.punjabi@company.com");
+
+SELECT first_name,last_name,email FROM employees
+WHERE department_id IN (SELECT department_id FROM departments WHERE department_name = "Human Resources");
+
+// NULL VALUES
+
+SELECT * FROM employees WHERE hire_date IS NOT NULL;
+
+UPDATE employees SET first_name="Arpit",last_name="Mishra" WHERE employee_id = 101;
+
+DELETE FROM employees WHERE employee_id = 101;
+
+
+SELECT first_name, last_name, email,hire_date FROM employees LIMIT 5;
+
+
+// Aggregative Functions
+
+SELECT MIN(Price) as Minimum_Price
+FROM Products WHERE status = 1;
+
+SELECT COUNT(employee_id) as total_employees
+FROM employees;
+
+
+SELECT COUNT(*) AS [Number of records], CategoryID
+FROM Products
+GROUP BY CategoryID;
+
+
+SELECT SUM(Quantity)
+FROM OrderDetails;
+
+
+
+SELECT SUM(bonus) as Total_Bonus
+FROM Salaries;
+
+
+SELECT OrderID, SUM(Quantity) AS [Total Quantity]
+FROM OrderDetails
+GROUP BY OrderID;
+
+
+SELECT AVG(Price) AS AveragePrice, CategoryID
+FROM Products
+GROUP BY CategoryID;
+
+
+SELECT * FROM Customers
+WHERE City LIKE 'L_nd__';
+
+SQL joins is used to combine rows from two or more tables
+
+
+Different Types of SQL JOINs
+Here are the different types of the JOINs in SQL:
+
+(INNER) JOIN: Returns records that have matching values in both tables
+LEFT (OUTER) JOIN: Returns all records from the left table, and the matched records from the right table
+RIGHT (OUTER) JOIN: Returns all records from the right table, and the matched records from the left table
+FULL (OUTER) JOIN: Returns all records when there is a match in either left or right table
+
+
+
+// INNER JOIN SQL QUERY
+
+SELECT employees.first_name,employees.last_name,employees.email,departments.department_name FROM employees INNER JOIN
+departments ON employees.department_id = departments.department_id;
+
+
+Syntax
+SELECT column_name(s)
+FROM table1
+INNER JOIN table2
+ON table1.column_name = table2.column_nam
+
+SELECT Products.ProductID, Products.ProductName, Categories.CategoryName
+FROM Products
+INNER JOIN Categories ON Products.CategoryID = Categories.CategoryID;
+
+SQL LEFT JOIN Keyword
+The LEFT JOIN keyword returns all records from the left table (table1), and the matching records from the right table (table2). The result is 0 records from the right side, if there is no match.
+
+LEFT JOIN Syntax
+SELECT column_name(s)
+FROM table1
+LEFT JOIN table2
+ON table1.column_name = table2.column_name;
+
+
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+LEFT JOIN Orders ON Customers.CustomerID = Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+SQL RIGHT JOIN Keyword
+The RIGHT JOIN keyword returns all records from the right table (table2), and the matching records from the left table (table1). The result is 0 records from the left side, if there is no match.
+
+SELECT column_name(s)
+FROM table1
+RIGHT JOIN table2
+ON table1.column_name = table2.column_name;
+
+
+SELECT Orders.OrderID, Employees.LastName, Employees.FirstName
+FROM Orders
+RIGHT JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID
+ORDER BY Orders.OrderID;
+
+
+SQL FULL OUTER JOIN Keyword
+The FULL OUTER JOIN keyword returns all records when there is a match in left (table1) or right (table2) table records.
+
+FULL OUTER JOIN Syntax
+SELECT column_name(s)
+FROM table1
+FULL OUTER JOIN table2
+ON table1.column_name = table2.column_name
+WHERE condition;
+
+SQL QUERY
+
+SELECT Customers.CustomerName, Orders.OrderID
+FROM Customers
+FULL OUTER JOIN Orders ON Customers.CustomerID=Orders.CustomerID
+ORDER BY Customers.CustomerName;
+
+
+//******************************************************************
+
+SQL Self Join
+A self join is a regular join, but the table is joined with itself.
+
+Self Join Syntax
+SELECT column_name(s)
+FROM table1 T1, table1 T2
+WHERE condition;
+
+
+The SQL UNION Operator
+The UNION operator is used to combine the result-set of two or more SELECT statements.
+
+The UNION operator automatically removes duplicate rows from the result set.
+
+
+Requirements for UNION:
+
+Every SELECT statement within UNION must have the same number of columns
+The columns must also have similar data types
+The columns in every SELECT statement must also be in the same order
+UNION Syntax
+
+
+SELECT column_name(s) FROM table1
+UNION
+SELECT column_name(s) FROM table2;
+
+SELECT City FROM Customers
+UNION
+SELECT City FROM Suppliers
+ORDER BY City;
+
+SELECT first_name FROM employees
+UNION
+SELECT department_name FROM departments;
+
+SELECT first_name FROM employees
+UNION
+SELECT department_name FROM departments;
+
+The UNION ALL operator is used to combine the result-set of two or more SELECT statements.
+
+The UNION ALL operator includes all rows from each statement, including any duplicates.
+
+
+SQL GROUP BY STATEMENT
+
+GROUP BY Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+ORDER BY column_name(s);
+
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country;
+
+
+SELECT COUNT(employee_id),department_id
+FROM employees
+GROUP BY department_id;
+
+
+
+SELECT Shippers.ShipperName, COUNT(Orders.OrderID) AS NumberOfOrders FROM Orders
+LEFT JOIN Shippers ON Orders.ShipperID = Shippers.ShipperID
+GROUP BY ShipperName;
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+ORDER BY COUNT(CustomerID) DESC;
+
+
+SELECT COUNT(employees.employee_id) AS total_employees,departments.department_name
+FROM employees
+LEFT JOIN departments ON employees.department_id = departments.department_id GROUP BY departments.department_id;
+
+
+The SQL HAVING Clause
+The HAVING clause was added to SQL because the WHERE keyword cannot be used with aggregate functions.
+
+
+HAVING Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE condition
+GROUP BY column_name(s)
+HAVING condition
+ORDER BY column_name(s);
+
+
+
+SELECT COUNT(CustomerID), Country
+FROM Customers
+GROUP BY Country
+HAVING COUNT(CustomerID) > 5;
+
+
+
+
+SELECT Employees.LastName, COUNT(Orders.OrderID) AS NumberOfOrders
+FROM Orders
+INNER JOIN Employees ON Orders.EmployeeID = Employees.EmployeeID
+WHERE LastName = 'Davolio' OR LastName = 'Fuller'
+GROUP BY LastName
+HAVING COUNT(Orders.OrderID) > 25;
+
+
+
+The SQL EXISTS Operator
+The EXISTS operator is used to test for the existence of any record in a subquery.
+
+The EXISTS operator returns TRUE if the subquery returns one or more records.
+
+EXISTS Syntax
+SELECT column_name(s)
+FROM table_name
+WHERE EXISTS
+(SELECT column_name FROM table_name WHERE condition);
+
+
+SELECT SupplierName
+FROM Suppliers
+WHERE EXISTS (SELECT ProductName FROM Products WHERE Products.SupplierID = Suppliers.supplierID AND Price < 20);
+
+CREATE DATABASE databasename;
+DROP DATABASE databasename;
+BACKUP DATABASE databasename
+TO DISK = 'filepath';
+
+
+CREATE INDEX Syntax
+Creates an index on a table. Duplicate values are allowed:
+
+CREATE INDEX index_name
+ON table_name (column1, column2, ...);
+
+CREATE INDEX idx_lastname
+ON Persons (LastName);
+
+CREATE INDEX idx_pname
+ON Persons (LastName, FirstName);
+
+DROP INDEX Statement
+The DROP INDEX statement is used to delete an index in a table.
+
+MS Access:
+
+DROP INDEX index_name ON table_name;
+
+
+ALTER TABLE - ADD Column
+To add a column in a table, use the following syntax:
+
+ALTER TABLE table_name
+ADD column_name datatype;
+
+
+ALTER TABLE Customers
+ADD Email varchar(255);
+
+ALTER TABLE table_name
+DROP COLUMN column_name;
+
+ALTER TABLE table_name
+RENAME COLUMN old_name to new_name;
+
+ALTER TABLE table_name
+MODIFY COLUMN column_name datatype;
