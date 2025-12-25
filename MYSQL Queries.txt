@@ -326,3 +326,27 @@ RENAME COLUMN old_name to new_name;
 
 ALTER TABLE table_name
 MODIFY COLUMN column_name datatype;
+
+
+// SQL Interview Questions
+
+SELECT e.name FROM
+employees e
+JOIN employees m
+ON e.id = m.id
+WHERE e.salary > m.salary;
+
+// department highest salary
+
+SELECT
+    e.first_name,
+    e.last_name,
+    d.name AS department_name,
+    e.salary
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id
+WHERE e.salary = (
+    SELECT MAX(e2.salary)
+    FROM employees e2
+    WHERE e2.department_id = e.department_id
+);
