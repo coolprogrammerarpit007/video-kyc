@@ -9,45 +9,60 @@ use Illuminate\Http\Request;
 class ApiController extends Controller
 {
     public function getSessionData(Request $request)
-    {
-        try
-        {
-            $user = $request->user();
-            $session = KycSession::where('user_id',$user->id)->where('status','pending')->first();
-            if(!$session)
-            {
-                return response()->json([
-                    'status' => true,
-                    'message' => 'No current pending session available',
-                    'data' => [
-                        'user_name' => $user->name,
-                        'session_status' => null
-                    ]
-                ],200);
-            }
+{
+    try {
+        $user = $request->user();
 
-            return response()->json([
-                'status' => true,
-                'message' => 'dashboard data fetched successfully!',
-                'data' => [
-                    'user_name' => $user->name,
-                    'uuid' => $session->uuid,
-                    'session_status' => $session->status,
-                    'verifier_id' => $session->verifier_id,
-                    'expired_at' => $session->expired_at,
-                    'user_joined_at' => $session->user_joined_at,
-                    'verifier_joined_at' => $session->verifier_joined_at
-                ]
-                ],200);
-        }
+        /**
+         * Active session
+         * Only ONE can exist at a time
+         */
+        $activeSession = KycSession::where('user_id', $user->id)
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->orderByDesc('created_at')
+            ->first();
 
-        catch(\Exception $e)
-        {
-            return response()->json([
-                'status'=>false,
-                'message' => 'something happen! try again after sometime!',
-                'errors' => $e->getMessage()
-            ],500);
-        }
+        /**
+         * Past sessions (history)
+         */
+        $pastSessions = KycSession::where('user_id', $user->id)
+            ->whereIn('status', ['completed', 'expired'])
+            ->orderByDesc('created_at')
+            ->get([
+                'uuid',
+                'status',
+                'expired_at',
+                'completed_at',
+                'created_at'
+            ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Dashboard data fetched successfully',
+            'data' => [
+                'user_name' => $user->name,
+
+                'active_session' => $activeSession ? [
+                    'uuid' => $activeSession->uuid,
+                    'status' => $activeSession->status,
+                    'verifier_id' => $activeSession->verifier_id,
+                    'expired_at' => $activeSession->expired_at,
+                    'user_joined_at' => $activeSession->user_joined_at,
+                    'verifier_joined_at' => $activeSession->verifier_joined_at,
+                    'created_at' => $activeSession->created_at,
+                ] : null,
+
+                'past_sessions' => $pastSessions
+            ]
+        ], 200);
+
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Something went wrong while fetching dashboard data',
+            'errors' => config('app.debug') ? $e->getMessage() : null
+        ], 500);
     }
+}
+
 }
