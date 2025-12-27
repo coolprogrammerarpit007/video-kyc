@@ -39,12 +39,12 @@ class KycSessionController extends Controller
                 'data' => [
                     'id' => $session->id,
                     'user_id' => $session->user_id,
-                    'status' => $session->status,
+                    'session_status' => $session->status,
                     'uuid' => $session->uuid,
                     'requested_at' => $session->requested_at,
                     'expired_at' => $session->expired_at,
                 ],
-                'session_join_link' => env('APP_URL') . "/kyc/session/$session->uuid"
+                // 'session_join_link' => config('app.url') . "/kyc/session/{$session->uuid}"
             ],201);
         }
 
@@ -60,11 +60,12 @@ class KycSessionController extends Controller
     }
 
 
-    public function show(Request $request, string $uuid)
+    public function show(Request $request)
     {
         try
         {
             $user = $request->user();
+            $uuid = $request->uuid;
             $session = KycSession::getCurrentKycSession($user,$uuid);
 
             if(!$session)
@@ -97,30 +98,32 @@ class KycSessionController extends Controller
             default       => 'unknown',
             };
 
+            $uiMessage = match($uiState)
+            {
+                'waiting_for_verifier' => 'Please wait for verifier to join.',
+                'ready_to_start'       => 'Verifier has joined. You may start your KYC.',
+                'session_completed'    => 'KYC session completed.',
+                'session_expired'      => 'KYC session expired.',
+                default                => '',
+            };
+
             return response()->json([
                 'status' => true,
+                'state' => $uiState,
+                'message' => $uiMessage,
                 'data' => [
                     'session' => [
                         'uuid' => $session->uuid,
-                        'status' => $session->status,
+                        'session_status' => $session->status,
                         'verifier_id' => $session->verifier_id,
                         'expired_at' => $session->expired_at,
+                        'user_joined_at' => $session->user_joined_at,
+                        'verifier_joined_at' => $session->verifier_joined_at
                     ],
                     'permissions' => [
                         'start_video' => $canStartVideo,
                         'upload_video' => $canUploadDocs,
                     ],
-                    'ui_hint' => [
-                        'state' => $uiState,
-                        'message' => match ($uiState) {
-                        'waiting_for_verifier' => 'Please wait for verifier to join.',
-                        'ready_to_start'       => 'Verifier has joined. You may start your KYC.',
-                        'session_completed'    => 'KYC session completed.',
-                        'session_expired'      => 'KYC session expired.',
-                        default                => '',
-                    },
-                ]
-
                 ]
                 ],200);
         }

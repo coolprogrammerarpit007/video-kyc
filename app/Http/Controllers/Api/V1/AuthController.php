@@ -51,9 +51,8 @@ class AuthController extends Controller
             {
                 return response()->json([
                     'status' => false,
-                    'msg' => 'Validation fails',
-                    'errors' => $validated->errors()
-                ])->setStatusCode(422,"Validation Error!");
+                    'msg' => $validated->errors()->first(),
+                ])->setStatusCode(200,"Validation Error!");
             }
 
             $validated = $validated->validate();
@@ -113,9 +112,8 @@ class AuthController extends Controller
             {
                 return response()->json([
                     'status' => false,
-                    'msg'=> 'Validation Fails',
-                    'errors' => $validated->errors()
-                ])->setStatusCode(422);
+                    'msg'=> $validated->errors()->first(),
+                ])->setStatusCode(200);
             }
 
             $validated = $validated->validate();
@@ -127,7 +125,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => false,
                     'msg' => 'Invalid Login credentials'
-                ],401);
+                ],200);
             }
 
             if(!Hash::check($validated['password'],$kyc_user->password))
@@ -135,7 +133,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => false,
                     'msg' => 'Invalid Login credentials'
-                ])->setStatusCode(401);
+                ])->setStatusCode(code: 200);
             }
 
             if($kyc_user->status != 'active')
@@ -143,7 +141,7 @@ class AuthController extends Controller
                 return response()->json([
                     'status' => false,
                     'msg' => 'Account is not Active'
-                ])->setStatusCode(403);
+                ])->setStatusCode(200);
             }
 
             $token = $kyc_user->createToken('auth_token')->plainTextToken;

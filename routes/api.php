@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\ApiController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\KycSessionController;
 use App\Http\Controllers\Api\V1\VerifierKycSessionController;
@@ -23,6 +24,8 @@ Route::prefix('v1')->group(function(){
     Route::post('/auth/register',[AuthController::class,'register']);
     Route::post('/auth/login',[AuthController::class,'login']);
     Route::post('/auth/logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+    // Get dashboard data
+    Route::get('/dashboard',[ApiController::class,'getSessionData'])->middleware('auth:sanctum');
 
 
     // ***************** Testing Middleware Roues *******************
@@ -45,9 +48,11 @@ Route::prefix('v1')->group(function(){
 */
 
 
+
+
 Route::middleware(['auth:sanctum','role:user'])->prefix('v1')->group(function(){
     Route::post('/kyc/sessions',[KycSessionController::class,'store']);
-    Route::get('/kyc/sessions/{uuid}',[KycSessionController::class,'show']);
+    Route::post('/kyc/sessions/show',[KycSessionController::class,'show']);
     Route::post('/kyc-sessions/user/join',[KycSessionController::class,'join']);
 });
 
