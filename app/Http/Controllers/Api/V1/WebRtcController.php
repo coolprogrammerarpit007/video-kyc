@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\WebRtcAnswerSent;
 use App\Events\WebRtcIceCandidateSent;
 use App\Events\WebRtcOfferSent;
 use App\Http\Controllers\Controller;
@@ -91,7 +92,7 @@ class WebRtcController extends Controller
 
             $session = $this->getReadySession($request->uuid);
 
-            event(new WebRtcOfferSent(
+            event(new WebRtcAnswerSent(
                 $session->uuid,$request->only('type','sdp'
             )));
 
